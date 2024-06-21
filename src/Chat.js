@@ -1,8 +1,6 @@
-// Chat.js
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { ref, onValue, push, set } from 'firebase/database';
-import { auth, database } from './firebaseConfig';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
 import './Chat.css';
 
 function Chat() {
@@ -11,6 +9,8 @@ function Chat() {
   const [recipient, setRecipient] = useState('');
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
+  const auth = getAuth();
+  const database = getDatabase();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -24,14 +24,13 @@ function Chat() {
           }
         });
 
+        // Fetch messages for the logged-in user in real-time
         const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            const messageList = Object.values(data).filter(
-              (msg) =>
-                msg.sender === username ||
-                msg.receiver === username
+            const messageList = Object.values(data).filter(msg =>
+              msg.sender === username || msg.receiver === username
             );
             setMessages(messageList);
           } else {
@@ -45,42 +44,32 @@ function Chat() {
     });
 
     return () => unsubscribe();
-  }, [username]);
+  }, [auth, database, username]);
 
-  const sendMessage = async (e) => {
+  const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() && recipient.trim() && user) {
-      try {
-        const messagesRef = ref(database, 'messages');
-        const newMessageRef = push(messagesRef);
-        await set(newMessageRef, {
-          sender: username,
-          receiver: recipient,
-          text: message,
-          timestamp: Date.now(),
-        });
-        setMessage('');
-        setRecipient('');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+      const messagesRef = ref(database, 'messages');
+      const newMessageRef = push(messagesRef);
+      set(newMessageRef, {
+        sender: username,
+        receiver: recipient,
+        text: message,
+        timestamp: Date.now()
+      });
+      setMessage('');
+      setRecipient('');
     }
   };
 
   return (
     <div className="chat-container">
       <h1>Private Chat</h1>
-      {user ? (
-        <p>Logged in as: {user.email}</p>
-      ) : (
-        <p>Loading...</p>
-      )}
+      {user ? <p>Logged in as: {user.email}</p> : <p>Loading...</p>}
       <div className="messages-container">
         <ul className="messages">
           {messages.map((msg, index) => (
-            <li key={index}>
-              <strong>{msg.sender}</strong>: {msg.text}
-            </li>
+            <li key={index}><strong>{msg.sender}</strong>: {msg.text}</li>
           ))}
         </ul>
       </div>
