@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getDatabase, ref, set } from 'firebase/database';
+import { useNavigate } from 'react-router-dom';
+import { auth, database } from './firebaseConfig'; // Adjust the import path as needed
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { ref, set } from 'firebase/database';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // New state for username
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null);
-  const auth = getAuth();
-  const database = getDatabase();
+  const navigate = useNavigate(); // Use navigation hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,21 +20,23 @@ function Login() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
-
-        // Save username to database
+        
+        // Save username to the database
         await set(ref(database, 'users/' + user.uid), {
           username: username,
-          email: email,
+          email: user.email
         });
 
+        navigate('/chat'); // Redirect to chat after registration
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
+        navigate('/chat'); // Redirect to chat after login
       }
     } catch (error) {
       console.error('Authentication error:', error);
-      setError(error.message); // Display error message to the user
+      setError(error.message);
     }
   };
 

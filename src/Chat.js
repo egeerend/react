@@ -20,7 +20,9 @@ function Chat() {
         const userRef = ref(database, 'users/' + user.uid);
         onValue(userRef, (snapshot) => {
           const data = snapshot.val();
-          setUsername(data.username);
+          if (data) {
+            setUsername(data.username);
+          }
         });
 
         // Fetch messages for the logged-in user
@@ -28,6 +30,7 @@ function Chat() {
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
+            console.log('Fetched messages:', data); // Debug log
             const messageList = Object.values(data).filter(msg =>
               msg.sender === username || msg.receiver === username
             );
@@ -64,7 +67,7 @@ function Chat() {
   return (
     <div className="chat-container">
       <h1>Private Chat</h1>
-      {user && <p>Logged in as: {user.email}</p>}
+      {user ? <p>Logged in as: {user.email}</p> : <p>Loading...</p>}
       <div className="messages-container">
         <ul className="messages">
           {messages.map((msg, index) => (
