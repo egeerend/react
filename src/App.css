@@ -36,3 +36,57 @@
     transform: rotate(360deg);
   }
 }
+
+/* New Styles for To-Do List */
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px;
+  width: 60%;
+  max-width: 300px;
+  border: 2px solid #61dafb;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #61dafb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+li.completed span {
+  text-decoration: line-through;
+}
+
+li button {
+  margin-left: 20px;
+  cursor: pointer;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+li span {
+  flex-grow: 1;
+  cursor: pointer;
+}
