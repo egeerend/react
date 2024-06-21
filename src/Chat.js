@@ -25,7 +25,7 @@ function Chat() {
           }
         });
 
-        // Fetch messages for the logged-in user
+        // Fetch messages for the logged-in user in real-time
         const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
