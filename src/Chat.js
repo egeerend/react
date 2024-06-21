@@ -30,7 +30,6 @@ function Chat() {
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            console.log('Fetched messages:', data); // Debug log
             const messageList = Object.values(data).filter(msg =>
               msg.sender === username || msg.receiver === username
             );
