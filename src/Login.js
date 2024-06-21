@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { auth } from './firebaseConfig'; // Ensure correct import path for Firebase auth
+import { useNavigate } from 'react-router-dom';
+import { auth } from './firebaseConfig'; // Adjust the import path as needed
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getDatabase, ref, set } from 'firebase/database';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null);
-  const database = getDatabase();
+  const navigate = useNavigate(); // Use navigation hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,21 +18,16 @@ function Login() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
-
-        // Save username to database
-        await set(ref(database, 'users/' + user.uid), {
-          username: username,
-          email: email,
-        });
-
+        navigate('/chat'); // Redirect to chat after registration
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
+        navigate('/chat'); // Redirect to chat after login
       }
     } catch (error) {
       console.error('Authentication error:', error);
-      setError(error.message); // Display error message to the user
+      setError(error.message);
     }
   };
 
@@ -41,15 +35,6 @@ function Login() {
     <div style={{ fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`, WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' }}>
       <h1>{isRegistering ? 'Register' : 'Login'}</h1>
       <form onSubmit={handleSubmit}>
-        {isRegistering && (
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        )}
         <input
           type="email"
           placeholder="Email"
