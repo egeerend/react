@@ -30,9 +30,7 @@ function Chat() {
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            const messageList = Object.values(data).filter(msg =>
-              msg.sender === username || msg.receiver === username
-            );
+            const messageList = Object.values(data);
             setMessages(messageList);
           } else {
             setMessages([]);
@@ -45,7 +43,7 @@ function Chat() {
     });
 
     return () => unsubscribe();
-  }, [auth, database, username]);
+  }, [auth, database]);
 
   const sendMessage = (e) => {
     e.preventDefault();
