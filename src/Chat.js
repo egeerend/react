@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import { auth, database } from './firebaseConfig'; // Adjust path as needed
 import './Chat.css';
 
 function Chat() {
@@ -9,28 +10,24 @@ function Chat() {
   const [recipient, setRecipient] = useState('');
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
-  const auth = getAuth();
-  const database = getDatabase();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        // Get username from database
         const userRef = ref(database, 'users/' + user.uid);
         onValue(userRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            setUsername(data.username);
+          const userData = snapshot.val();
+          if (userData) {
+            setUsername(userData.username);
           }
         });
 
-        // Fetch messages for the logged-in user in real-time
         const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            const messageList = Object.values(data);
+          const messageData = snapshot.val();
+          if (messageData) {
+            const messageList = Object.values(messageData);
             setMessages(messageList);
           } else {
             setMessages([]);
@@ -43,7 +40,7 @@ function Chat() {
     });
 
     return () => unsubscribe();
-  }, [auth, database]);
+  }, []);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -65,7 +62,7 @@ function Chat() {
     <div className="chat-container">
       <h1>Private Chat</h1>
       {user ? <p>Logged in as: {user.email}</p> : <p>Loading...</p>}
-      
+
       <div className="messages-container">
         {messages.length > 0 ? (
           <ul className="messages">
@@ -79,7 +76,7 @@ function Chat() {
           <p>No messages yet</p>
         )}
       </div>
-      
+
       <form onSubmit={sendMessage} className="message-form">
         <input
           type="text"
