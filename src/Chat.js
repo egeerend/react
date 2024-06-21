@@ -6,7 +6,7 @@ import './Chat.css';
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
-  const [recipient, setRecipient] = useState(''); // New state for recipient
+  const [recipient, setRecipient] = useState('');
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
   const auth = getAuth();
@@ -22,11 +22,17 @@ function Chat() {
           const data = snapshot.val();
           setUsername(data.username);
         });
+
+        // Fetch messages for the logged-in user
         const userMessagesRef = ref(database, 'messages/' + user.uid);
         onValue(userMessagesRef, (snapshot) => {
           const data = snapshot.val();
-          const messageList = data ? Object.values(data) : [];
-          setMessages(messageList);
+          if (data) {
+            const messageList = Object.values(data);
+            setMessages(messageList);
+          } else {
+            setMessages([]);
+          }
         });
       } else {
         setUser(null);
