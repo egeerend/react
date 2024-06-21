@@ -37,56 +37,51 @@
   }
 }
 
-/* New Styles for To-Do List */
-
-input {
-  padding: 10px;
-  font-size: 16px;
-  margin: 10px;
-  width: 60%;
-  max-width: 300px;
-  border: 2px solid #61dafb;
-  border-radius: 5px;
+.chat-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
 }
 
-button {
-  padding: 10px 20px;
-  margin-left: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: #61dafb;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
-ul {
+.messages {
   list-style-type: none;
   padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 0;
+  text-align: left;
 }
 
-li {
+.messages li {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.message-form {
   display: flex;
-  align-items: center;
-  margin: 10px 0;
-  font-size: 18px;
+  margin-top: 20px;
 }
 
-li.completed span {
-  text-decoration: line-through;
+.message-form input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-li button {
-  margin-left: 20px;
-  cursor: pointer;
-  background-color: #ff4d4d;
-  color: white;
+.message-form button {
+  padding: 10px 20px;
+  font-size: 16px;
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-li span {
-  flex-grow: 1;
+  background-color: #61dafb;
+  color: white;
+  border-radius: 4px;
+  margin-left: 10px;
   cursor: pointer;
 }

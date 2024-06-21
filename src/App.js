@@ -1,53 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import { database } from './firebaseConfig'; // Import Firebase configuration
+import logo from './logo.svg';
 import './App.css';
 
 function App() {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
-  const handleInputChange = (e) => {
-    setNewTask(e.target.value);
-  };
+  useEffect(() => {
+    const messagesRef = ref(database, 'messages');
+    onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      const messageList = data ? Object.values(data) : [];
+      setMessages(messageList);
+    });
+  }, []);
 
-  const addTask = () => {
-    if (newTask.trim() !== '') {
-      setTasks([...tasks, { text: newTask, completed: false }]);
-      setNewTask('');
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (message.trim()) {
+      const messagesRef = ref(database, 'messages');
+      const newMessageRef = push(messagesRef);
+      set(newMessageRef, { text: message });
+      setMessage('');
     }
-  };
-
-  const toggleTaskCompletion = (index) => {
-    const updatedTasks = tasks.map((task, i) =>
-      i === index ? { ...task, completed: !task.completed } : task
-    );
-    setTasks(updatedTasks);
-  };
-
-  const deleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src="logo.svg" className="App-logo" alt="logo" />
-        <h1>To-Do List</h1>
-        <input
-          type="text"
-          value={newTask}
-          onChange={handleInputChange}
-          placeholder="Add a new task"
-        />
-        <button onClick={addTask}>Add Task</button>
-        <ul>
-          {tasks.map((task, index) => (
-            <li key={index} className={task.completed ? 'completed' : ''}>
-              <span onClick={() => toggleTaskCompletion(index)}>{task.text}</span>
-              <button onClick={() => deleteTask(index)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+        <img src={logo} className="App-logo" alt="logo" />
+        <h1>Chat App</h1>
+        <div className="chat-container">
+          <ul className="messages">
+            {messages.map((msg, index) => (
+              <li key={index}>{msg.text}</li>
+            ))}
+          </ul>
+          <form onSubmit={sendMessage} className="message-form">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type a message..."
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
         <a
           className="App-link"
           href="https://reactjs.org"
