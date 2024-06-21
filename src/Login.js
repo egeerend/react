@@ -1,9 +1,8 @@
 // Login.js
+
 import React, { useState } from 'react';
 import { auth } from './firebaseConfig'; // Adjust the import path to './firebaseConfig'
-
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import './Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -36,7 +35,7 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
+    <div style={{ fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif`, WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale' }}>
       <h1>{isRegistering ? 'Register' : 'Login'}</h1>
       <form onSubmit={handleSubmit}>
         <input
