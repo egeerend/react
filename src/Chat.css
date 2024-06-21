@@ -1,37 +1,36 @@
 .chat-container {
-    text-align: center;
-    margin-top: 50px;
-  }
-  
-  .messages-container {
-    height: 300px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
-    padding: 10px;
-  }
-  
-  .messages {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .messages li {
-    margin: 5px 0;
-  }
-  
-  .message-form {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  
-  .message-form input {
-    padding: 10px;
-    width: 200px;
-    margin-right: 10px;
-  }
-  
-  .message-form button {
-    padding: 10px;
-  }
-  
+  text-align: center;
+  margin-top: 50px;
+}
+
+.messages-container {
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.messages {
+  list-style-type: none;
+  padding: 0;
+}
+
+.messages li {
+  margin: 5px 0;
+}
+
+.message-form {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.message-form input {
+  padding: 10px;
+  width: 200px;
+  margin-right: 10px;
+}
+
+.message-form button {
+  padding: 10px;
+}

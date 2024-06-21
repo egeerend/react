@@ -1,61 +1,101 @@
-// Chat.js
 import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, push, onValue, set } from 'firebase/database';
-import { auth } from './firebaseConfig'; // Adjust the path as per your project structure
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getDatabase, ref, onValue, push, set } from 'firebase/database';
+import './Chat.css';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState('');
+  const [message, setMessage] = useState('');
+  const [recipient, setRecipient] = useState('');
+  const [user, setUser] = useState(null);
+  const [username, setUsername] = useState('');
+  const auth = getAuth();
   const database = getDatabase();
 
   useEffect(() => {
-    // Listen for incoming messages
-    const messagesRef = ref(database, 'messages');
-    onValue(messagesRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const messageList = Object.values(data);
-        setMessages(messageList);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        // Get username from database
+        const userRef = ref(database, 'users/' + user.uid);
+        onValue(userRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            setUsername(data.username);
+          }
+        });
+
+        // Fetch messages for the logged-in user
+        const messagesRef = ref(database, 'messages');
+        onValue(messagesRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const messageList = Object.values(data).filter(msg =>
+              msg.sender === username || msg.receiver === username
+            );
+            setMessages(messageList);
+          } else {
+            setMessages([]);
+          }
+        });
       } else {
+        setUser(null);
         setMessages([]);
       }
     });
-  }, [database]);
 
-  const sendMessage = async (e) => {
+    return () => unsubscribe();
+  }, [auth, database, username]);
+
+  const sendMessage = (e) => {
     e.preventDefault();
-    if (messageText.trim()) {
-      const newMessageRef = push(ref(database, 'messages'));
-      const user = auth.currentUser;
-      const username = user ? user.email : 'Anonymous';
-      const timestamp = Date.now();
-      
-      await set(newMessageRef, {
+    if (message.trim() && recipient.trim() && user) {
+      const messagesRef = ref(database, 'messages');
+      const newMessageRef = push(messagesRef);
+      set(newMessageRef, {
         sender: username,
-        text: messageText,
-        timestamp: timestamp,
+        receiver: recipient,
+        text: message,
+        timestamp: Date.now()
       });
-
-      setMessageText('');
+      setMessage('');
+      setRecipient('');
     }
   };
 
   return (
-    <div>
-      <h2>Chat Room</h2>
-      <div>
-        {messages.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.sender}:</strong> {msg.text}
-          </div>
-        ))}
+    <div className="chat-container">
+      <h1>Private Chat</h1>
+      {user ? <p>Logged in as: {user.email}</p> : <p>Loading...</p>}
+      
+      <div className="messages-container">
+        {messages.length > 0 ? (
+          <ul className="messages">
+            {messages.map((msg, index) => (
+              <li key={index}>
+                <strong>{msg.sender}:</strong> {msg.text}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No messages yet</p>
+        )}
       </div>
-      <form onSubmit={sendMessage}>
+      
+      <form onSubmit={sendMessage} className="message-form">
         <input
           type="text"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          placeholder="Type your message..."
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+          placeholder="Recipient username..."
+          required
+        />
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message..."
+          required
         />
         <button type="submit">Send</button>
       </form>
