@@ -11,7 +11,7 @@ function App() {
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed:', user); // Add this log to debug
+      console.log('Auth state changed:', user); // Debug log
       setIsAuthenticated(!!user);
     });
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { auth } from './firebaseConfig'; // Adjust the import path as needed
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -7,6 +8,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Use navigation hook
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,10 +18,12 @@ function Login() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
+        navigate('/chat'); // Redirect to chat after registration
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
+        navigate('/chat'); // Redirect to chat after login
       }
     } catch (error) {
       console.error('Authentication error:', error);
