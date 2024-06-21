@@ -13,11 +13,13 @@ function Login() {
 
     try {
       if (isRegistering) {
+        // Registering a new user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
         // Optionally: You can redirect the user after successful registration
       } else {
+        // Logging in an existing user
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
