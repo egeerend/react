@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDatabase, ref, onValue, push, set } from 'firebase/database';
-import { database } from './firebaseConfig'; // Import Firebase configuration
+import { database } from './firebaseConfig'; // Ensure this path is correct
 import logo from './logo.svg';
 import './App.css';
 
