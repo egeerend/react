@@ -24,12 +24,13 @@ function Chat() {
         });
 
         // Fetch messages for the logged-in user
-        const userMessagesRef = ref(database, 'messages/' + user.uid);
-        onValue(userMessagesRef, (snapshot) => {
+        const messagesRef = ref(database, 'messages');
+        onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            console.log('Fetched messages:', data); // Debug log
-            const messageList = Object.values(data);
+            const messageList = Object.values(data).filter(msg =>
+              msg.sender === username || msg.receiver === username
+            );
             setMessages(messageList);
           } else {
             setMessages([]);
@@ -42,14 +43,19 @@ function Chat() {
     });
 
     return () => unsubscribe();
-  }, [auth, database]);
+  }, [auth, database, username]);
 
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() && recipient.trim() && user) {
-      const recipientRef = ref(database, 'messages/' + recipient);
-      const newMessageRef = push(recipientRef);
-      set(newMessageRef, { sender: username, text: message, timestamp: Date.now() });
+      const messagesRef = ref(database, 'messages');
+      const newMessageRef = push(messagesRef);
+      set(newMessageRef, {
+        sender: username,
+        receiver: recipient,
+        text: message,
+        timestamp: Date.now()
+      });
       setMessage('');
       setRecipient('');
     }
@@ -62,7 +68,7 @@ function Chat() {
       <div className="messages-container">
         <ul className="messages">
           {messages.map((msg, index) => (
-            <li key={index}>{msg.sender}: {msg.text}</li>
+            <li key={index}><strong>{msg.sender}</strong>: {msg.text}</li>
           ))}
         </ul>
       </div>
