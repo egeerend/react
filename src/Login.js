@@ -1,36 +1,31 @@
-// Login.js
-
 import React, { useState } from 'react';
-import { auth } from './firebaseConfig'; // Adjust the import path to './firebaseConfig'
+import { auth } from './firebaseConfig'; // Adjust the import path as needed
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isRegistering) {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log('User registered:', userCredential.user);
-          // Handle successful registration
-        })
-        .catch((error) => {
-          console.error('Error registering:', error);
-          // Handle registration error
-        });
-    } else {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log('User logged in:', userCredential.user);
-          // Handle successful login
-        })
-        .catch((error) => {
-          console.error('Error logging in:', error);
-          // Handle login error
-        });
+
+    try {
+      if (isRegistering) {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('User registered:', user);
+        // Optionally: You can redirect the user after successful registration
+      } else {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log('User logged in:', user);
+        // Optionally: You can redirect the user after successful login
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      setError(error.message); // Display error message to the user
     }
   };
 
@@ -57,6 +52,7 @@ function Login() {
       <button onClick={() => setIsRegistering(!isRegistering)}>
         {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
       </button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }
