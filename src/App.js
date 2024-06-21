@@ -1,63 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { getDatabase, ref, onValue, push, set } from 'firebase/database';
-import { database } from './firebaseConfig'; // Ensure this path is correct
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import Login from './Login';
+import Chat from './Chat';
 import './App.css';
 
 function App() {
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const auth = getAuth();
 
-  useEffect(() => {
-    const messagesRef = ref(database, 'messages');
-    onValue(messagesRef, (snapshot) => {
-      const data = snapshot.val();
-      const messageList = data ? Object.values(data) : [];
-      setMessages(messageList);
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
     });
-  }, []);
 
-  const sendMessage = (e) => {
-    e.preventDefault();
-    if (message.trim()) {
-      const messagesRef = ref(database, 'messages');
-      const newMessageRef = push(messagesRef);
-      set(newMessageRef, { text: message });
-      setMessage('');
-    }
-  };
+    return () => unsubscribe();
+  }, [auth]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>Chat App</h1>
-        <div className="chat-container">
-          <ul className="messages">
-            {messages.map((msg, index) => (
-              <li key={index}>{msg.text}</li>
-            ))}
-          </ul>
-          <form onSubmit={sendMessage} className="message-form">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message..."
-            />
-            <button type="submit">Send</button>
-          </form>
-        </div>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/chat"
+            element={isAuthenticated ? <Chat /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to={isAuthenticated ? "/chat" : "/login"} />}
+          />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
