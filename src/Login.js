@@ -1,12 +1,14 @@
+// Login.js
 import React, { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebaseConfig'; // Adjust the import path to './firebaseConfig'
+
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import './Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
-  const auth = getAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,17 +16,21 @@ function Login() {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           console.log('User registered:', userCredential.user);
+          // Handle successful registration
         })
         .catch((error) => {
           console.error('Error registering:', error);
+          // Handle registration error
         });
     } else {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           console.log('User logged in:', userCredential.user);
+          // Handle successful login
         })
         .catch((error) => {
           console.error('Error logging in:', error);
+          // Handle login error
         });
     }
   };
