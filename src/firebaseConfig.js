@@ -3,16 +3,16 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase } from "firebase/database"; // Import getDatabase
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration using environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyCPs5yCvcBwsWFgmBb2sJAMAkKxvjikiDE",
-  authDomain: "react-chat-5de7f.firebaseapp.com",
-  databaseURL: "https://react-chat-5de7f-default-rtdb.firebaseio.com",
-  projectId: "react-chat-5de7f",
-  storageBucket: "react-chat-5de7f.appspot.com",
-  messagingSenderId: "64427033362",
-  appId: "1:64427033362:web:9ca08e31371b69b3abe9cb",
-  measurementId: "G-FEJHYQE53H"
+  apiKey: process.env.REACT_APP_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
