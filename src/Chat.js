@@ -1,8 +1,9 @@
+// Chat.js
 import React, { useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getDatabase, ref, onValue, push, set } from 'firebase/database';
-import './Chat.css';
+import { onAuthStateChanged } from 'firebase/auth';
+import { ref, onValue, push, set } from 'firebase/database';
 import { auth, database } from './firebaseConfig';
+import './Chat.css';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -12,13 +13,10 @@ function Chat() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    const authInstance = getAuth(auth);
-    const dbInstance = getDatabase(database);
-
-    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        const userRef = ref(dbInstance, 'users/' + user.uid);
+        const userRef = ref(database, 'users/' + user.uid);
         onValue(userRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
@@ -26,7 +24,7 @@ function Chat() {
           }
         });
 
-        const messagesRef = ref(dbInstance, 'messages');
+        const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
@@ -49,21 +47,23 @@ function Chat() {
     return () => unsubscribe();
   }, [username]);
 
-  const sendMessage = (e) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() && recipient.trim() && user) {
-      const dbInstance = getDatabase(database);
-
-      const messagesRef = ref(dbInstance, 'messages');
-      const newMessageRef = push(messagesRef);
-      set(newMessageRef, {
-        sender: username,
-        receiver: recipient,
-        text: message,
-        timestamp: Date.now(),
-      });
-      setMessage('');
-      setRecipient('');
+      try {
+        const messagesRef = ref(database, 'messages');
+        const newMessageRef = push(messagesRef);
+        await set(newMessageRef, {
+          sender: username,
+          receiver: recipient,
+          text: message,
+          timestamp: Date.now(),
+        });
+        setMessage('');
+        setRecipient('');
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
     }
   };
 
