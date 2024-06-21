@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, ref, onValue, push, set } from 'firebase/database';
 import './Chat.css';
-import { auth, database } from './firebaseConfig'; // Import Firebase config and auth/database
+import { auth, database } from './firebaseConfig';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -12,13 +12,12 @@ function Chat() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    const authInstance = getAuth(auth); // Initialize auth instance
-    const dbInstance = getDatabase(database); // Initialize database instance
+    const authInstance = getAuth(auth);
+    const dbInstance = getDatabase(database);
 
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       if (user) {
         setUser(user);
-        // Get username from database
         const userRef = ref(dbInstance, 'users/' + user.uid);
         onValue(userRef, (snapshot) => {
           const data = snapshot.val();
@@ -27,7 +26,6 @@ function Chat() {
           }
         });
 
-        // Fetch messages for the logged-in user
         const messagesRef = ref(dbInstance, 'messages');
         onValue(messagesRef, (snapshot) => {
           const data = snapshot.val();
@@ -54,7 +52,7 @@ function Chat() {
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim() && recipient.trim() && user) {
-      const dbInstance = getDatabase(database); // Initialize database instance
+      const dbInstance = getDatabase(database);
 
       const messagesRef = ref(dbInstance, 'messages');
       const newMessageRef = push(messagesRef);
