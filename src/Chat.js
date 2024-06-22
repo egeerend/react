@@ -27,7 +27,10 @@ function Chat() {
         onValue(messagesRef, (snapshot) => {
           const messageData = snapshot.val();
           if (messageData) {
-            const messageList = Object.values(messageData);
+            const messageList = Object.keys(messageData).map(key => ({
+              id: key,
+              ...messageData[key]
+            }));
             setMessages(messageList);
           } else {
             setMessages([]);
@@ -66,8 +69,8 @@ function Chat() {
       <div className="messages-container">
         {messages.length > 0 ? (
           <ul className="messages">
-            {messages.map((msg, index) => (
-              <li key={index}>
+            {messages.map((msg) => (
+              <li key={msg.id}>
                 <strong>{msg.sender}:</strong> {msg.text}
               </li>
             ))}
